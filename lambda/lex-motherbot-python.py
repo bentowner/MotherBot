@@ -1,5 +1,5 @@
 """
- This Lex Code Hook Interface serves a bot which manages parental events as appointments.
+ This Lex Code Hook Interface serves MotherBot which manages parental events, contacts and events.
  Bot, Intent, and Slot models can be found in the Lex Console as part of 'MotherBot'.
 
 """
@@ -285,45 +285,14 @@ def add_days(date, number_of_days):
     return new_date.strftime('%Y-%m-%d')
 
 
+""" --- Functions that build for the controller for dialog actions --- """
+
 def build_validation_result(is_valid, violated_slot, message_content):
     return {
         'isValid': is_valid,
         'violatedSlot': violated_slot,
         'message': {'contentType': 'PlainText', 'content': message_content}
     }
-
-
-def validate_book_appointment(appointment_type, date, appointment_time):
-    if appointment_type and not get_duration(appointment_type):
-        return build_validation_result(False, 'AppointmentType', 'I did not recognize that, can I book you a root canal, cleaning, or whitening?')
-
-    if appointment_time:
-        if len(appointment_time) != 5:
-            return build_validation_result(False, 'Time', 'I did not recognize that, what time would you like to book your appointment?')
-
-        hour, minute = appointment_time.split(':')
-        hour = parse_int(hour)
-        minute = parse_int(minute)
-        if math.isnan(hour) or math.isnan(minute):
-            return build_validation_result(False, 'Time', 'I did not recognize that, what time would you like to book your appointment?')
-
-        if hour < 10 or hour > 16:
-            # Outside of business hours
-            return build_validation_result(False, 'Time', 'Our business hours are ten a.m. to five p.m.  What time works best for you?')
-
-        if minute not in [30, 0]:
-            # Must be booked on the hour or half hour
-            return build_validation_result(False, 'Time', 'We schedule appointments every half hour, what time works best for you?')
-
-    if date:
-        if not isvalid_date(date):
-            return build_validation_result(False, 'Date', 'I did not understand that, what date works best for you?')
-        elif datetime.datetime.strptime(date, '%Y-%m-%d').date() <= datetime.date.today():
-            return build_validation_result(False, 'Date', 'Appointments must be scheduled a day in advance.  Can you try a different date?')
-        elif dateutil.parser.parse(date).weekday() == 5 or dateutil.parser.parse(date).weekday() == 6:
-            return build_validation_result(False, 'Date', 'Our office is not open on the weekends, can you provide a work day?')
-
-    return build_validation_result(True, None, None)
 
 
 def build_time_output_string(appointment_time):
@@ -392,6 +361,40 @@ def build_options(slot, appointment_type, date, booking_map):
             options.append({'text': build_time_output_string(availabilities[i]), 'value': build_time_output_string(availabilities[i])})
 
         return options
+
+""" --- Functions that validate the controller methods --- """
+
+def validate_book_appointment(appointment_type, date, appointment_time):
+    if appointment_type and not get_duration(appointment_type):
+        return build_validation_result(False, 'AppointmentType', 'I did not recognize that, can I book you a root canal, cleaning, or whitening?')
+
+    if appointment_time:
+        if len(appointment_time) != 5:
+            return build_validation_result(False, 'Time', 'I did not recognize that, what time would you like to book your appointment?')
+
+        hour, minute = appointment_time.split(':')
+        hour = parse_int(hour)
+        minute = parse_int(minute)
+        if math.isnan(hour) or math.isnan(minute):
+            return build_validation_result(False, 'Time', 'I did not recognize that, what time would you like to book your appointment?')
+
+        if hour < 10 or hour > 16:
+            # Outside of business hours
+            return build_validation_result(False, 'Time', 'Our business hours are ten a.m. to five p.m.  What time works best for you?')
+
+        if minute not in [30, 0]:
+            # Must be booked on the hour or half hour
+            return build_validation_result(False, 'Time', 'We schedule appointments every half hour, what time works best for you?')
+
+    if date:
+        if not isvalid_date(date):
+            return build_validation_result(False, 'Date', 'I did not understand that, what date works best for you?')
+        elif datetime.datetime.strptime(date, '%Y-%m-%d').date() <= datetime.date.today():
+            return build_validation_result(False, 'Date', 'Appointments must be scheduled a day in advance.  Can you try a different date?')
+        elif dateutil.parser.parse(date).weekday() == 5 or dateutil.parser.parse(date).weekday() == 6:
+            return build_validation_result(False, 'Date', 'Our office is not open on the weekends, can you provide a work day?')
+
+    return build_validation_result(True, None, None)
 
 
 def validate_book_car(slots):
@@ -474,418 +477,69 @@ def validate_hotel(slots):
     return {'isValid': True}
 
 
-""" --- Functions that control the bot's behavior --- """
+""" --- Functions that act as controllers of the bot's behavior --- """
 
-
-def make_appointment(intent_request):
+def meet_a_friend(intent_request):
     """
-    Performs dialog management and fulfillment for booking a dentists appointment.
-
-    Beyond fulfillment, the implementation for this intent demonstrates the following:
-    1) Use of elicitSlot in slot validation and re-prompting
-    2) Use of confirmIntent to support the confirmation of inferred slot values, when confirmation is required
-    on the bot model and the inferred slot values fully specify the intent.
+    Performs dialog management and fulfillment for registering contact information known as friends.
     """
-    appointment_type = intent_request['currentIntent']['slots']['AppointmentType']
-    date = intent_request['currentIntent']['slots']['Date']
-    appointment_time = intent_request['currentIntent']['slots']['Time']
+    friend_info = intent_request['currentIntent']['slots']['Friend']
     source = intent_request['invocationSource']
     output_session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
-    booking_map = json.loads(try_ex(lambda: output_session_attributes['bookingMap']) or '{}')
 
     if source == 'DialogCodeHook':
         # Perform basic validation on the supplied input slots.
         slots = intent_request['currentIntent']['slots']
-        validation_result = validate_book_appointment(appointment_type, date, appointment_time)
-        if not validation_result['isValid']:
-            slots[validation_result['violatedSlot']] = None
-            return elicit_slot(
-                output_session_attributes,
-                intent_request['currentIntent']['name'],
-                slots,
-                validation_result['violatedSlot'],
-                validation_result['message'],
-                build_response_card(
-                    'Specify {}'.format(validation_result['violatedSlot']),
-                    validation_result['message']['content'],
-                    build_options(validation_result['violatedSlot'], 'appointment_type', date, booking_map)
-                )
-            )
-
-        if not appointment_type:
-            return elicit_slot(
-                output_session_attributes,
-                intent_request['currentIntent']['name'],
-                intent_request['currentIntent']['slots'],
-                'AppointmentType',
-                {'contentType': 'PlainText', 'content': 'What type of appointment would you like to schedule?'},
-                build_response_card(
-                    'Specify Appointment Type', 'What type of appointment would you like to schedule?',
-                    build_options('AppointmentType', appointment_type, date, None)
-                )
-            )
-
-        if appointment_type and not date:
-            return elicit_slot(
-                output_session_attributes,
-                intent_request['currentIntent']['name'],
-                intent_request['currentIntent']['slots'],
-                'Date',
-                {'contentType': 'PlainText', 'content': 'When would you like to schedule your {}?'.format(appointment_type)},
-                build_response_card(
-                    'Specify Date',
-                    'When would you like to schedule your {}?'.format(appointment_type),
-                    build_options('Date', 'appointment_type', date, None)
-                )
-            )
-
-        if appointment_type and date:
-            # Fetch or generate the availabilities for the given date.
-            booking_availabilities = try_ex(lambda: booking_map[date])
-            if booking_availabilities is None:
-                booking_availabilities = get_availabilities(date)
-                booking_map[date] = booking_availabilities
-                output_session_attributes['bookingMap'] = json.dumps(booking_map)
-
-            appointment_type_availabilities = get_availabilities_for_duration(get_duration(appointment_type), booking_availabilities)
-            if len(appointment_type_availabilities) == 0:
-                # No availability on this day at all; ask for a new date and time.
-                slots['Date'] = None
-                slots['Time'] = None
-                return elicit_slot(
-                    output_session_attributes,
-                    intent_request['currentIntent']['name'],
-                    slots,
-                    'Date',
-                    {'contentType': 'PlainText', 'content': 'We do not have any availability on that date, is there another day which works for you?'},
-                    build_response_card(
-                        'Specify Date',
-                        'What day works best for you?',
-                        build_options('Date', 'appointment_type', date, None)
-                    )
-                )
-
-            message_content = 'What time on {} works for you? '.format(date)
-            if appointment_time:
-                output_session_attributes['formattedTime'] = build_time_output_string(appointment_time)
-                # Validate that proposed time for the appointment can be booked by first fetching the availabilities for the given day.  To
-                # give consistent behavior in the sample, this is stored in sessionAttributes after the first lookup.
-                if is_available(appointment_time, get_duration(appointment_type), booking_availabilities):
-                    return delegate(output_session_attributes, slots)
-                message_content = 'The time you requested is not available. '
-
-            if len(appointment_type_availabilities) == 1:
-                # If there is only one availability on the given date, try to confirm it.
-                slots['Time'] = appointment_type_availabilities[0]
-                return confirm_intent(
-                    output_session_attributes,
-                    intent_request['currentIntent']['name'],
-                    slots,
-                    {
-                        'contentType': 'PlainText',
-                        'content': '{}{} is our only availability, does that work for you?'.format
-                                   (message_content, build_time_output_string(appointment_type_availabilities[0]))
-                    },
-                    build_response_card(
-                        'Confirm Appointment',
-                        'Is {} on {} okay?'.format(build_time_output_string(appointment_type_availabilities[0]), date),
-                        [{'text': 'yes', 'value': 'yes'}, {'text': 'no', 'value': 'no'}]
-                    )
-                )
-
-            available_time_string = build_available_time_string(appointment_type_availabilities)
-            return elicit_slot(
-                output_session_attributes,
-                intent_request['currentIntent']['name'],
-                slots,
-                'Time',
-                {'contentType': 'PlainText', 'content': '{}{}'.format(message_content, available_time_string)},
-                build_response_card(
-                    'Specify Time',
-                    'What time works best for you?',
-                    build_options('Time', 'appointment_type', date, None)
-                )
-            )
 
         return delegate(output_session_attributes, slots)
 
-    # Book the appointment.  In a real bot, this would likely involve a call to a backend service.
-    duration = get_duration(appointment_type)
-    booking_availabilities = booking_map[date]
-    if booking_availabilities:
-        # Remove the availability slot for the given date as it has now been booked.
-        booking_availabilities.remove(appointment_time)
-        if duration == 60:
-            second_half_hour_time = increment_time_by_thirty_mins(appointment_time)
-            booking_availabilities.remove(second_half_hour_time)
 
-        booking_map[date] = booking_availabilities
-        output_session_attributes['bookingMap'] = json.dumps(booking_map)
-    else:
-        # This is not treated as an error as this code sample supports functionality either as fulfillment or dialog code hook.
-        logger.debug('Availabilities for {} were null at fulfillment time.  '
-                     'This should have been initialized if this function was configured as the dialog code hook'.format(date))
-
-    return close(
-        output_session_attributes,
-        'Fulfilled',
-        {
-            'contentType': 'PlainText',
-            'content': 'Okay, I have booked your appointment.  We will see you at {} on {}'.format(build_time_output_string(appointment_time), date)
-        }
-    )
-
-
-def book_hotel(intent_request):
+def can_i_call(intent_request):
     """
-    Performs dialog management and fulfillment for booking a hotel.
-
-    Beyond fulfillment, the implementation for this intent demonstrates the following:
-    1) Use of elicitSlot in slot validation and re-prompting
-    2) Use of sessionAttributes to pass information that can be used to guide conversation
+    Performs dialog management and fulfillment for approval tasks of mobile permissions.
     """
+    call_info = intent_request['currentIntent']['slots']['Calling']
+    source = intent_request['invocationSource']
+    output_session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
 
-    location = try_ex(lambda: intent_request['currentIntent']['slots']['Location'])
-    checkin_date = try_ex(lambda: intent_request['currentIntent']['slots']['CheckInDate'])
-    nights = safe_int(try_ex(lambda: intent_request['currentIntent']['slots']['Nights']))
+    if source == 'DialogCodeHook':
+        # Perform basic validation on the supplied input slots.
+        slots = intent_request['currentIntent']['slots']
 
-    room_type = try_ex(lambda: intent_request['currentIntent']['slots']['RoomType'])
-    session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
-
-    # Load confirmation history and track the current reservation.
-    reservation = json.dumps({
-        'ReservationType': 'Hotel',
-        'Location': location,
-        'RoomType': room_type,
-        'CheckInDate': checkin_date,
-        'Nights': nights
-    })
-
-    session_attributes['currentReservation'] = reservation
-
-    if intent_request['invocationSource'] == 'DialogCodeHook':
-        # Validate any slots which have been specified.  If any are invalid, re-elicit for their value
-        validation_result = validate_hotel(intent_request['currentIntent']['slots'])
-        if not validation_result['isValid']:
-            slots = intent_request['currentIntent']['slots']
-            slots[validation_result['violatedSlot']] = None
-
-            return elicit_slot(
-                session_attributes,
-                intent_request['currentIntent']['name'],
-                slots,
-                validation_result['violatedSlot'],
-                validation_result['message'],
-                build_response_card(
-                    'Specify Time',
-                    'What time works best for you?',
-                    build_options('Time', 'appointment_type', date, None)
-                )
-            )
-
-        # Otherwise, let native DM rules determine how to elicit for slots and prompt for confirmation.  Pass price
-        # back in sessionAttributes once it can be calculated; otherwise clear any setting from sessionAttributes.
-        if location and checkin_date and nights and room_type:
-            # The price of the hotel has yet to be confirmed.
-            price = generate_hotel_price(location, nights, room_type)
-            session_attributes['currentReservationPrice'] = price
-        else:
-            try_ex(lambda: session_attributes.pop('currentReservationPrice'))
-
-        session_attributes['currentReservation'] = reservation
-        return delegate(session_attributes, intent_request['currentIntent']['slots'])
-
-    # Booking the hotel.  In a real application, this would likely involve a call to a backend service.
-    logger.debug('bookHotel under={}'.format(reservation))
-
-    try_ex(lambda: session_attributes.pop('currentReservationPrice'))
-    try_ex(lambda: session_attributes.pop('currentReservation'))
-    session_attributes['lastConfirmedReservation'] = reservation
-
-    return close(
-        session_attributes,
-        'Fulfilled',
-        {
-            'contentType': 'PlainText',
-            'content': 'Thanks, I have placed your reservation.   Please let me know if you would like to book a car '
-                       'rental, or another hotel.'
-        }
-    )
+        return delegate(output_session_attributes, slots)
 
 
-def book_car(intent_request):
+def can_i_goto(intent_request):
     """
-    Performs dialog management and fulfillment for booking a car.
-
-    Beyond fulfillment, the implementation for this intent demonstrates the following:
-    1) Use of elicitSlot in slot validation and re-prompting
-    2) Use of sessionAttributes to pass information that can be used to guide conversation
+    Performs dialog management and fulfillment for approval tasks of places to visit.
     """
-    slots = intent_request['currentIntent']['slots']
-    pickup_city = slots['PickUpCity']
-    pickup_date = slots['PickUpDate']
-    return_date = slots['ReturnDate']
-    driver_age = slots['DriverAge']
-    car_type = slots['CarType']
-    confirmation_status = intent_request['currentIntent']['confirmationStatus']
-    session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
-    last_confirmed_reservation = try_ex(lambda: session_attributes['lastConfirmedReservation'])
-    if last_confirmed_reservation:
-        last_confirmed_reservation = json.loads(last_confirmed_reservation)
-    confirmation_context = try_ex(lambda: session_attributes['confirmationContext'])
+    friend_home_info = intent_request['currentIntent']['slots']['FriendHouse']
+    public_places = intent_request['currentIntent']['slots']['PublicPlaces']
+    source = intent_request['invocationSource']
+    output_session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
 
-    # Load confirmation history and track the current reservation.
-    reservation = json.dumps({
-        'ReservationType': 'Car',
-        'PickUpCity': pickup_city,
-        'PickUpDate': pickup_date,
-        'ReturnDate': return_date,
-        'CarType': car_type
-    })
-    session_attributes['currentReservation'] = reservation
+    if source == 'DialogCodeHook':
+        # Perform basic validation on the supplied input slots.
+        slots = intent_request['currentIntent']['slots']
 
-    if pickup_city and pickup_date and return_date and driver_age and car_type:
-        # Generate the price of the car in case it is necessary for future steps.
-        price = generate_car_price(pickup_city, get_day_difference(pickup_date, return_date), driver_age, car_type)
-        session_attributes['currentReservationPrice'] = price
+        return delegate(output_session_attributes, slots)
 
-    if intent_request['invocationSource'] == 'DialogCodeHook':
-        # Validate any slots which have been specified.  If any are invalid, re-elicit for their value
-        validation_result = validate_book_car(intent_request['currentIntent']['slots'])
-        if not validation_result['isValid']:
-            slots[validation_result['violatedSlot']] = None
-            return elicit_slot(
-                session_attributes,
-                intent_request['currentIntent']['name'],
-                slots,
-                validation_result['violatedSlot'],
-                validation_result['message'],
-                build_response_card(
-                    'Specify Time',
-                    'What time works best for you?',
-                    build_options('Time', 'appointment_type', 'date', 'None')
-                )
-            )
 
-        # Determine if the intent (and current slot settings) has been denied.  The messaging will be different
-        # if the user is denying a reservation he initiated or an auto-populated suggestion.
-        if confirmation_status == 'Denied':
-            # Clear out auto-population flag for subsequent turns.
-            try_ex(lambda: session_attributes.pop('confirmationContext'))
-            try_ex(lambda: session_attributes.pop('currentReservation'))
-            if confirmation_context == 'AutoPopulate':
-                return elicit_slot(
-                    session_attributes,
-                    intent_request['currentIntent']['name'],
-                    {
-                        'PickUpCity': None,
-                        'PickUpDate': None,
-                        'ReturnDate': None,
-                        'DriverAge': None,
-                        'CarType': None
-                    },
-                    'PickUpCity',
-                    {
-                        'contentType': 'PlainText',
-                        'content': 'Where would you like to make your car reservation?'
-                    },
-                    build_response_card(
-                        'Specify Time',
-                        'What time works best for you?',
-                        build_options('Time', 'appointment_type', 'date', 'None')
-                    )
-                )
+def can_i_see(intent_request):
+    """
+    Performs dialog management and fulfillment for for approval tasks of events to attend.
+    """
+    event_info = intent_request['currentIntent']['slots']['Events']
+    movie_info = intent_request['currentIntent']['slots']['Movies']
+    concert_info = intent_request['currentIntent']['slots']['Concerts']
+    source = intent_request['invocationSource']
+    output_session_attributes = intent_request['sessionAttributes'] if intent_request['sessionAttributes'] is not None else {}
 
-            return delegate(session_attributes, intent_request['currentIntent']['slots'])
+    if source == 'DialogCodeHook':
+        # Perform basic validation on the supplied input slots.
+        slots = intent_request['currentIntent']['slots']
 
-        if confirmation_status == 'None':
-            # If we are currently auto-populating but have not gotten confirmation, keep requesting for confirmation.
-            if (not pickup_city and not pickup_date and not return_date and not driver_age and not car_type)\
-                    or confirmation_context == 'AutoPopulate':
-                if last_confirmed_reservation and try_ex(lambda: last_confirmed_reservation['ReservationType']) == 'Hotel':
-                    # If the user's previous reservation was a hotel - prompt for a rental with
-                    # auto-populated values to match this reservation.
-                    session_attributes['confirmationContext'] = 'AutoPopulate'
-                    return confirm_intent(
-                        session_attributes,
-                        intent_request['currentIntent']['name'],
-                        {
-                            'PickUpCity': last_confirmed_reservation['Location'],
-                            'PickUpDate': last_confirmed_reservation['CheckInDate'],
-                            'ReturnDate': add_days(
-                                last_confirmed_reservation['CheckInDate'], last_confirmed_reservation['Nights']
-                            ),
-                            'CarType': None,
-                            'DriverAge': None
-                        },
-                        {
-                            'contentType': 'PlainText',
-                            'content': 'Is this car rental for your {} night stay in {} on {}?'.format(
-                                last_confirmed_reservation['Nights'],
-                                last_confirmed_reservation['Location'],
-                                last_confirmed_reservation['CheckInDate']
-                            )
-                        }
-                    )
-
-            # Otherwise, let native DM rules determine how to elicit for slots and/or drive confirmation.
-            return delegate(session_attributes, intent_request['currentIntent']['slots'])
-
-        # If confirmation has occurred, continue filling any unfilled slot values or pass to fulfillment.
-        if confirmation_status == 'Confirmed':
-            # Remove confirmationContext from sessionAttributes so it does not confuse future requests
-            try_ex(lambda: session_attributes.pop('confirmationContext'))
-            if confirmation_context == 'AutoPopulate':
-                if not driver_age:
-                    return elicit_slot(
-                        session_attributes,
-                        intent_request['currentIntent']['name'],
-                        intent_request['currentIntent']['slots'],
-                        'DriverAge',
-                        {
-                            'contentType': 'PlainText',
-                            'content': 'How old is the driver of this car rental?'
-                        },
-                        build_response_card(
-                            'Specify Time',
-                            'What time works best for you?',
-                            build_options('Time', 'appointment_type', date, None)
-                        )
-                    )
-                elif not car_type:
-                    return elicit_slot(
-                        session_attributes,
-                        intent_request['currentIntent']['name'],
-                        intent_request['currentIntent']['slots'],
-                        'CarType',
-                        {
-                            'contentType': 'PlainText',
-                            'content': 'What type of car would you like? Popular models are '
-                                       'economy, midsize, and luxury.'
-                        },
-                        build_response_card(
-                            'Specify Time',
-                            'What time works best for you?',
-                            build_options('Time', 'appointment_type', date, None)
-                        )
-                    )
-
-            return delegate(session_attributes, intent_request['currentIntent']['slots'])
-
-    # Booking the car.  In a real application, this would likely involve a call to a backend service.
-    logger.debug('bookCar at={}'.format(reservation))
-    del session_attributes['currentReservationPrice']
-    del session_attributes['currentReservation']
-    session_attributes['lastConfirmedReservation'] = reservation
-    return close(
-        session_attributes,
-        'Fulfilled',
-        {
-            'contentType': 'PlainText',
-            'content': 'Thanks, I have placed your reservation.'
-        }
-    )
-
+        return delegate(output_session_attributes, slots)
 
 """ --- Intents --- """
 
@@ -901,17 +555,13 @@ def dispatch(intent_request):
 
     # Dispatch to your bot's intent handlers
     if intent_name == 'CanICall':
-        return make_appointment(intent_request)
+        return can_i_call(intent_request)
     elif intent_name == 'CanIGOTO':
-        return make_appointment(intent_request)
+        return can_i_goto(intent_request)
     elif intent_name == 'CanISee':
-        return make_appointment(intent_request)
+        return can_i_see(intent_request)
     elif intent_name == 'MeetAFriend':
-        return make_appointment(intent_request)
-    elif intent_name == 'BookHotel':
-        return book_hotel(intent_request)
-    elif intent_name == 'BookCar':
-        return book_car(intent_request)
+        return meet_a_friend(intent_request)
 
     raise Exception('Intent with name ' + intent_name + ' not supported')
 
