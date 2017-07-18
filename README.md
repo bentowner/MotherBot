@@ -52,22 +52,28 @@ Text the MotherBot’s Twilio Phone Number: **(201)431-7268** to access MotherBo
 Intents  
 * MeetAFriend  
   Slots: FriendInfo  
-  Utterances:  
+  Utterances:  meet a friend
+  Utterances:  I would like you to meet a friend
   Prompts:  
 * CanICall  
   Slots: WhoCall  
-  Utterances:  
+  Utterances:  Can I call someone
+  Utterances:  Can I call ​{Calling}​
   Prompts:  
 * CanIGoTo:   
   Slots: ApprovedFriendsHome - Available approved Friend's House  
   Slots: ApprovedPublicPlaces – Pool Club, Library, Bowling, Mall  
-  Utterances:  
+  Utterances:  Can I go somewhere
+  Utterances:  Can I go ​{FriendHouse}​
+  Utterances:  Can I go ​{PublicPlaces}​
   Prompts:  
 * CanISee:  
   Slots: Events –   
   Slots: Approved Movie   
   Slots: Approved Concert  
-  Utterances:  
+  Utterances:  Can I go see an ​{Events}​
+  Utterances:  Can I go see an ​{Movies}​
+  Utterances:  Can I go see a {Concerts}
   Prompts:  
 
 [aws]: https://bentowner.blob.core.windows.net/images/EPS.png?raw=true "AWS Chatbot Challenge"
