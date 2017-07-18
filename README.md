@@ -75,6 +75,8 @@ Intents
   Utterances:  Can I go see an ​{Movies}​
   Utterances:  Can I go see a {Concerts}
   Prompts:  
+![alt text][facebook]
+![alt text][facebook2]
 
 [aws]: https://bentowner.blob.core.windows.net/images/EPS.png?raw=true "AWS Chatbot Challenge"
 [friend]: https://bentowner.blob.core.windows.net/images/meetafriend.png?raw=true "Meet a friend Intent"
@@ -83,3 +85,6 @@ Intents
 [twilio1]: https://bentowner.blob.core.windows.net/images/twilio.png?raw=true "twilio Api"
 [twilio2]: https://bentowner.blob.core.windows.net/images/twilio2.png?raw=true "twilio"
 [api]: https://bentowner.blob.core.windows.net/images/api.png?raw=true "AWS API Gateway"
+
+[facebook]: https://bentowner.blob.core.windows.net/images/FacebookMessage.png?raw=true "AWS API Gateway"
+[facebook2]: https://bentowner.blob.core.windows.net/images/FacebookPage.png?raw=true "AWS API Gateway"
