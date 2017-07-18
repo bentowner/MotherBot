@@ -1,6 +1,6 @@
 {
    "name": "MotherBot",
-   "description": null,
+   "description": "Sharing Calendars, Contacts and Management for the C.E.O. of the Home",
    "intents": [
       {
          "intentName": "CanIGOTO",
@@ -12,7 +12,7 @@
       },
       {
          "intentName": "CanICall",
-         "intentVersion": "5"
+         "intentVersion": "6"
       },
       {
          "intentName": "MeetAFriend",
@@ -40,16 +40,90 @@
    },
    "status": "READY",
    "failureReason": null,
-   "lastUpdatedDate": "2017-07-18T01:24:59.188Z",
-   "createdDate": "2017-07-18T01:24:32.989Z",
+   "lastUpdatedDate": "2017-07-18T02:53:37.937Z",
+   "createdDate": "2017-07-18T02:53:16.077Z",
    "idleSessionTTLInSeconds": 300,
    "voiceId": "Joanna",
-   "checksum": "e495e45e-4198-43f9-bf92-6ffb610f1215",
-   "version": "1",
+   "checksum": "13cd7238-6abf-4b10-96a4-fb06e6bce9d2",
+   "version": "2",
    "locale": "en-US",
    "childDirected": false,
    "dependencies": {
       "intents": [
+         {
+            "name": "CanICall",
+            "description": null,
+            "slots": [
+               {
+                  "name": "Calling",
+                  "description": null,
+                  "slotConstraint": "Optional",
+                  "slotType": "WhoCall",
+                  "slotTypeVersion": "1",
+                  "valueElicitationPrompt": {
+                     "messages": [
+                        {
+                           "contentType": "PlainText",
+                           "content": "Who would you like to call"
+                        }
+                     ],
+                     "maxAttempts": 2,
+                     "responseCard": null
+                  },
+                  "priority": 1,
+                  "sampleUtterances": [],
+                  "responseCard": null
+               }
+            ],
+            "sampleUtterances": [
+               "Can I call someone",
+               "Can I call {Calling}"
+            ],
+            "confirmationPrompt": {
+               "messages": [
+                  {
+                     "contentType": "PlainText",
+                     "content": "Sure, I don't mind if you call your {Calling}"
+                  }
+               ],
+               "maxAttempts": 3,
+               "responseCard": null
+            },
+            "rejectionStatement": {
+               "messages": [
+                  {
+                     "contentType": "PlainText",
+                     "content": "Think it over, and get back to me."
+                  }
+               ],
+               "responseCard": null
+            },
+            "conclusionStatement": {
+               "messages": [
+                  {
+                     "contentType": "PlainText",
+                     "content": "Yes, you can call {Calling}"
+                  }
+               ],
+               "responseCard": null
+            },
+            "dialogCodeHook": {
+               "uri": "arn:aws:lambda:us-east-1:493588642573:function:MotherBot",
+               "messageVersion": "1.0"
+            },
+            "fulfillmentActivity": {
+               "type": "CodeHook",
+               "codeHook": {
+                  "uri": "arn:aws:lambda:us-east-1:493588642573:function:MotherBot",
+                  "messageVersion": "1.0"
+               }
+            },
+            "parentIntentSignature": null,
+            "lastUpdatedDate": "2017-07-18T02:48:11.566Z",
+            "createdDate": "2017-07-18T02:48:11.566Z",
+            "version": "6",
+            "checksum": "ee43e071-f663-4c8c-9805-c9682b97c09e"
+         },
          {
             "name": "CanIGOTO",
             "description": null,
@@ -114,52 +188,6 @@
             "createdDate": "2017-07-17T23:48:35.510Z",
             "version": "3",
             "checksum": "2b1aed51-7f7d-49bb-92ed-548f1635260e"
-         },
-         {
-            "name": "MeetAFriend",
-            "description": null,
-            "slots": [
-               {
-                  "name": "Friend",
-                  "description": null,
-                  "slotConstraint": "Required",
-                  "slotType": "FriendInfo",
-                  "slotTypeVersion": "1",
-                  "valueElicitationPrompt": {
-                     "messages": [
-                        {
-                           "contentType": "PlainText",
-                           "content": "How can I get to know them"
-                        }
-                     ],
-                     "maxAttempts": 2,
-                     "responseCard": null
-                  },
-                  "priority": 1,
-                  "sampleUtterances": [],
-                  "responseCard": null
-               }
-            ],
-            "sampleUtterances": [
-               "I would like you to meet a friend",
-               "meet a friend"
-            ],
-            "dialogCodeHook": {
-               "uri": "arn:aws:lambda:us-east-1:493588642573:function:MotherBot",
-               "messageVersion": "1.0"
-            },
-            "fulfillmentActivity": {
-               "type": "CodeHook",
-               "codeHook": {
-                  "uri": "arn:aws:lambda:us-east-1:493588642573:function:MotherBot",
-                  "messageVersion": "1.0"
-               }
-            },
-            "parentIntentSignature": null,
-            "lastUpdatedDate": "2017-07-17T23:48:35.550Z",
-            "createdDate": "2017-07-17T23:48:35.550Z",
-            "version": "4",
-            "checksum": "15e774f9-a4bc-4f5a-8c96-f0f7abb43233"
          },
          {
             "name": "CanISee",
@@ -247,20 +275,20 @@
             "checksum": "d5e022d4-38b7-4773-ac31-771e044091cf"
          },
          {
-            "name": "CanICall",
+            "name": "MeetAFriend",
             "description": null,
             "slots": [
                {
-                  "name": "Calling",
+                  "name": "Friend",
                   "description": null,
-                  "slotConstraint": "Optional",
-                  "slotType": "WhoCall",
+                  "slotConstraint": "Required",
+                  "slotType": "FriendInfo",
                   "slotTypeVersion": "1",
                   "valueElicitationPrompt": {
                      "messages": [
                         {
                            "contentType": "PlainText",
-                           "content": "Who would you like to call"
+                           "content": "How can I get to know them"
                         }
                      ],
                      "maxAttempts": 2,
@@ -272,53 +300,54 @@
                }
             ],
             "sampleUtterances": [
-               "Can I call someone",
-               "Can I call {Calling}"
+               "I would like you to meet a friend",
+               "meet a friend"
             ],
-            "confirmationPrompt": {
-               "messages": [
-                  {
-                     "contentType": "PlainText",
-                     "content": "Sure, I don't mind if you call your {Calling}"
-                  }
-               ],
-               "maxAttempts": 3,
-               "responseCard": null
-            },
-            "rejectionStatement": {
-               "messages": [
-                  {
-                     "contentType": "PlainText",
-                     "content": "Think it over, and get back to me."
-                  }
-               ],
-               "responseCard": null
-            },
             "dialogCodeHook": {
                "uri": "arn:aws:lambda:us-east-1:493588642573:function:MotherBot",
                "messageVersion": "1.0"
             },
             "fulfillmentActivity": {
-               "type": "ReturnIntent"
+               "type": "CodeHook",
+               "codeHook": {
+                  "uri": "arn:aws:lambda:us-east-1:493588642573:function:MotherBot",
+                  "messageVersion": "1.0"
+               }
             },
             "parentIntentSignature": null,
-            "lastUpdatedDate": "2017-07-17T23:48:35.611Z",
-            "createdDate": "2017-07-17T23:48:35.611Z",
-            "version": "5",
-            "checksum": "7cca3df5-c0e6-4f31-a7c8-068c6e95f00f"
+            "lastUpdatedDate": "2017-07-17T23:48:35.550Z",
+            "createdDate": "2017-07-17T23:48:35.550Z",
+            "version": "4",
+            "checksum": "15e774f9-a4bc-4f5a-8c96-f0f7abb43233"
          }
       ],
       "slotTypes": [
          {
-            "name": "ApprovedFriendsHome",
-            "description": "Available Friend's Home",
+            "name": "MovieTypes",
+            "description": "Approved Movies",
             "enumerationValues": [
                {
-                  "value": "list"
+                  "value": "Movie List"
                }
             ],
-            "lastUpdatedDate": "2017-07-16T22:10:04.812Z",
-            "createdDate": "2017-07-16T22:10:04.812Z",
+            "lastUpdatedDate": "2017-07-17T21:41:50.584Z",
+            "createdDate": "2017-07-17T21:41:50.584Z",
+            "version": "1",
+            "checksum": null
+         },
+         {
+            "name": "Events",
+            "description": "Approved events that can be attended",
+            "enumerationValues": [
+               {
+                  "value": "Movie"
+               },
+               {
+                  "value": "Band"
+               }
+            ],
+            "lastUpdatedDate": "2017-07-17T21:27:38.028Z",
+            "createdDate": "2017-07-17T21:27:38.028Z",
             "version": "1",
             "checksum": null
          },
@@ -341,51 +370,6 @@
             ],
             "lastUpdatedDate": "2017-07-17T21:26:01.471Z",
             "createdDate": "2017-07-17T21:26:01.471Z",
-            "version": "1",
-            "checksum": null
-         },
-         {
-            "name": "MovieTypes",
-            "description": "Approved Movies",
-            "enumerationValues": [
-               {
-                  "value": "Movie List"
-               }
-            ],
-            "lastUpdatedDate": "2017-07-17T21:41:50.584Z",
-            "createdDate": "2017-07-17T21:41:50.584Z",
-            "version": "1",
-            "checksum": null
-         },
-         {
-            "name": "ApprovedConcertTypes",
-            "description": "Approved Concert Venues",
-            "enumerationValues": [
-               {
-                  "value": "Beach Pier Gathering"
-               },
-               {
-                  "value": "Music Hall"
-               }
-            ],
-            "lastUpdatedDate": "2017-07-17T21:52:03.369Z",
-            "createdDate": "2017-07-17T21:52:03.369Z",
-            "version": "1",
-            "checksum": null
-         },
-         {
-            "name": "Events",
-            "description": "Approved events that can be attended",
-            "enumerationValues": [
-               {
-                  "value": "Movie"
-               },
-               {
-                  "value": "Band"
-               }
-            ],
-            "lastUpdatedDate": "2017-07-17T21:27:38.028Z",
-            "createdDate": "2017-07-17T21:27:38.028Z",
             "version": "1",
             "checksum": null
          },
@@ -424,6 +408,35 @@
             ],
             "lastUpdatedDate": "2017-07-16T22:00:31.379Z",
             "createdDate": "2017-07-16T22:00:31.379Z",
+            "version": "1",
+            "checksum": null
+         },
+         {
+            "name": "ApprovedConcertTypes",
+            "description": "Approved Concert Venues",
+            "enumerationValues": [
+               {
+                  "value": "Beach Pier Gathering"
+               },
+               {
+                  "value": "Music Hall"
+               }
+            ],
+            "lastUpdatedDate": "2017-07-17T21:52:03.369Z",
+            "createdDate": "2017-07-17T21:52:03.369Z",
+            "version": "1",
+            "checksum": null
+         },
+         {
+            "name": "ApprovedFriendsHome",
+            "description": "Available Friend's Home",
+            "enumerationValues": [
+               {
+                  "value": "list"
+               }
+            ],
+            "lastUpdatedDate": "2017-07-16T22:10:04.812Z",
+            "createdDate": "2017-07-16T22:10:04.812Z",
             "version": "1",
             "checksum": null
          }
