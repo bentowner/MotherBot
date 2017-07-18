@@ -44,31 +44,31 @@ Coordinating the activity workflow is a major undertaking.  Similar to Booking H
 # Amazon API Gateway
 An HTTPS endpoint was created on the AWS API Gateway to interact with Twilio.  A Lambda function is the preprocessing layer between Amazon Lex and Twilio and was created using the awslabs/amazon-lex-twilio-integration.  Any Bot can be added to use the API Gateway by adjusting the Environment Variables.
 
-Text the MotherBot’s Twilio Phone Number: (201)431-7268 to access MotherBot by Mobile Device.
+Text the MotherBot’s Twilio Phone Number: **(201)431-7268** to access MotherBot by Mobile Device.
 
 ![alt text][api]
 
 ## Models
 Intents  
 * MeetAFriend  
- Slots: FriendInfo  
- Utterances:  
- Prompts:  
+  Slots: FriendInfo  
+  Utterances:  
+  Prompts:  
 * CanICall  
- Slots: WhoCall  
- Utterances:  
- Prompts:  
+  Slots: WhoCall  
+  Utterances:  
+  Prompts:  
 * CanIGoTo:   
- Slots: ApprovedFriendsHome - Available approved Friend's House  
- Slots: ApprovedPublicPlaces – Pool Club, Library, Bowling, Mall  
- Utterances:  
- Prompts:  
+  Slots: ApprovedFriendsHome - Available approved Friend's House  
+  Slots: ApprovedPublicPlaces – Pool Club, Library, Bowling, Mall  
+  Utterances:  
+  Prompts:  
 * CanISee:  
- Slots: Events –   
- Slots: Approved Movie   
- Slots: Approved Concert  
- Utterances:  
- Prompts:  
+  Slots: Events –   
+  Slots: Approved Movie   
+  Slots: Approved Concert  
+  Utterances:  
+  Prompts:  
 
 [aws]: https://bentowner.blob.core.windows.net/images/EPS.png?raw=true "AWS Chatbot Challenge"
 [friend]: https://bentowner.blob.core.windows.net/images/meetafriend.png?raw=true "Meet a friend Intent"
