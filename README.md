@@ -56,5 +56,5 @@ Intents
 [friend]: https://bentowner.blob.core.windows.net/images/meetafriend.png?raw=true "Meet a friend Intent"
 [serverless]: https://bentowner.blob.core.windows.net/images/serverlessarch.png?raw=true "AWS serverless arch"
 [motherbot]: https://bentowner.blob.core.windows.net/images/MotherBot2.png?raw=true "MotherBot"
-[twilio1]: https://bentowner.blob.core.windows.net/images/MotherBot2.png?raw=true "twilio Api"
-[twilio2]: https://bentowner.blob.core.windows.net/images/MotherBot2.png?raw=true "twilio"
+[twilio1]: https://bentowner.blob.core.windows.net/images/twilio.png?raw=true "twilio Api"
+[twilio2]: https://bentowner.blob.core.windows.net/images/twilio2.png?raw=true "twilio"
