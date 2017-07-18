@@ -29,6 +29,24 @@ Managing the contacts that are made are very important in a digital age.  This i
 **Phone Verification**, using Twillio, is used to make sure people are who they say they are when signing up as a ‘Friend’. It reduces risk and prevents fraudulent signups and increases trust. Phone verification events are best implemented when the user is giving you their number for the first time.  When a user triggers that event, generate a One Time Passcode (OTP) and send it via SMS to the user Present the user with a UI to enter the code and verify the code against the one you generated to see if they match.   
 
 ![alt text][twilio1]
+![alt text][twilio2]
+
+## Workflow
+Information management about the households Who, Where and What is the primary goal of an activity approval workflow.  It helps gather the details that are needed to make a decision.  Once decisions are made Logistics can be considered, and sometimes the logistics dictates whether and Activity can be approved.
+
+Activity Approval starts after approved events, locations and authenticated friends have been entered.
+
+## Calendar Events
+Coordinating the activity workflow is a major undertaking.  Similar to Booking Hotels and Cars, accounting for events will help manage the household calendar.
+•	Arrival Alerts
+•	Appointment Reminders
+
+# Amazon API Gateway
+An HTTPS endpoint was created on the AWS API Gateway to interact with Twilio.  A Lambda function is the preprocessing layer between Amazon Lex and Twilio and was created using the awslabs/amazon-lex-twilio-integration.  Any Bot can be added to use the API Gateway by adjusting the Environment Variables.
+
+Text the MotherBot’s Twilio Phone Number: (201)431-7268 to access MotherBot by Mobile Device.
+
+![alt text][api]
 
 ## Models
 Intents  
@@ -58,3 +76,4 @@ Intents
 [motherbot]: https://bentowner.blob.core.windows.net/images/MotherBot2.png?raw=true "MotherBot"
 [twilio1]: https://bentowner.blob.core.windows.net/images/twilio.png?raw=true "twilio Api"
 [twilio2]: https://bentowner.blob.core.windows.net/images/twilio2.png?raw=true "twilio"
+[api]: https://bentowner.blob.core.windows.net/images/api.png?raw=true "AWS API Gateway"
