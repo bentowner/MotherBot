@@ -24,25 +24,25 @@ There are 3 main functional aspects to MotherBot.
 
 ## Models
 Intents
-•	MeetAFriend  
-o	Slots: FriendInfo  
-o	Utterances:  
-o	Prompts:  
-•	CanICall  
-o	Slots: WhoCall  
-o	Utterances:  
-o	Prompts:  
-•	CanIGoTo:   
-o	Slots: ApprovedFriendsHome - Available approved Friend's House  
-o	Slots: ApprovedPublicPlaces – Pool Club, Library, Bowling, Mall  
-o	Utterances:  
-o	Prompts:  
-•	CanISee:  
-o	Slots: Events –   
-o	Slots: Approved Movie   
-o	Slots: Approved Concert  
-o	Utterances:  
-o	Prompts:  
+• MeetAFriend  
+o Slots: FriendInfo  
+o Utterances:  
+o Prompts:  
+• CanICall  
+o Slots: WhoCall  
+o Utterances:  
+o Prompts:  
+• CanIGoTo:   
+o Slots: ApprovedFriendsHome - Available approved Friend's House  
+o Slots: ApprovedPublicPlaces – Pool Club, Library, Bowling, Mall  
+o Utterances:  
+o Prompts:  
+• CanISee:  
+o Slots: Events –   
+o Slots: Approved Movie   
+o Slots: Approved Concert  
+o Utterances:  
+o Prompts:  
 
 [aws]: https://bentowner.blob.core.windows.net/images/EPS.png?raw=true "AWS Chatbot Challenge"
 [friend]: https://bentowner.blob.core.windows.net/images/meetafriend.png?raw=true "Meet a friend Intent"
